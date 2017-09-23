@@ -1,1 +1,1 @@
-obj-y = main.o keypad.o
+obj-y = main.o keypad.o led.o

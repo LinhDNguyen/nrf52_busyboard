@@ -12,6 +12,7 @@
 #include <misc/printk.h>
 
 #include "keypad.h"
+#include "led.h"
 
 void main(void)
 {
@@ -24,7 +25,15 @@ void main(void)
 
 		if (val != 0) {
 			// Has key pressed
-			printk("+%c+\n", val);
+			printk("+%c+", val);
+			if (val <= '9') {
+				led_display(val - '0');
+			} else if (val == '*') {
+				led_display(10);
+			} else {
+				printk("special key");
+			}
+			printk("\n");
 		}
 	}
 }
