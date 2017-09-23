@@ -19,6 +19,7 @@ const char chars[][3] = {
 };
 
 static struct device *gpiob = NULL;
+static char s_prev_char = 0;
 
 void keypad_config()
 {
@@ -48,13 +49,19 @@ char keypad_scan()
 	u32_t val;
 
 	for (i = 0; i < sizeof(row_pins); ++i) {
-		k_sleep(1);
 		ret = gpio_pin_write(gpiob, row_pins[i], 1);
-		k_sleep(5);
+		k_sleep(1);
 
 		for (j = 0; j < sizeof(col_pins); ++j) {
 			ret = gpio_pin_read(gpiob, col_pins[j], &val);
 			if (val != 0) {
+				// Filter if hold a key
+				if (0 != s_prev_char) {
+					// printk("prev: %c,nothing\n", s_prev_char);
+					goto lb_nothing;
+				}
+				s_prev_char = chars[i][j];
+				// printk("OK: %c\n", s_prev_char);
 				return chars[i][j];
 			}
 		}
@@ -62,5 +69,8 @@ char keypad_scan()
 		ret = gpio_pin_write(gpiob, row_pins[i], 0);
 	}
 
+	// printk("NONE\n");
+	s_prev_char = 0;
+lb_nothing:
 	return 0;
 }

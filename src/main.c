@@ -24,7 +24,7 @@ void main(void)
 
 		if (val != 0) {
 			// Has key pressed
-			printk("%c\n", val);
+			printk("+%c+\n", val);
 		}
 	}
 }
