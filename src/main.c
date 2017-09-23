@@ -17,8 +17,9 @@ void main(void)
 {
 	keypad_config();
 
+	printk("Press KEYPAD\n");
 	while (1) {
-		k_sleep(50);
+		k_sleep(100);
 		char val = keypad_scan();
 
 		if (val != 0) {
