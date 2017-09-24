@@ -2,16 +2,16 @@
 #define __LED_H__ 1
 
 typedef enum {
-	LED_PIN_1 = 9,
-	LED_PIN_2 = 10,
-	LED_PIN_3,
-	LED_PIN_4,
-	LED_PIN_5,
-	LED_PIN_6,
-	LED_PIN_7,
-	LED_PIN_8,
-	LED_PIN_9,
-	LED_PIN_10,
+	LED_PIN_1 = 11,
+	LED_PIN_2 = 12,
+	LED_PIN_3 = 13,
+	LED_PIN_4 = 14,
+	LED_PIN_5 = 15,
+	LED_PIN_6 = 16,
+	LED_PIN_7 = 17,
+	LED_PIN_8 = 18,
+	LED_PIN_9 = 19,
+	LED_PIN_10 = 20,
 } led_pin_t;
 
 typedef enum {

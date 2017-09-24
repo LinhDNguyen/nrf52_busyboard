@@ -17,6 +17,9 @@
 void main(void)
 {
 	keypad_config();
+	printk("keypad init done\n");
+	led_init();
+	printk("led init done\n");
 
 	printk("Press KEYPAD\n");
 	while (1) {
@@ -25,10 +28,11 @@ void main(void)
 
 		if (val != 0) {
 			// Has key pressed
-			printk("+%c+", val);
-			if (val <= '9') {
+			printk("+%c+\n", val);
+			if ((val >= '0') && (val <= '9')) {
 				led_display(val - '0');
 			} else if (val == '*') {
+				printk("ALL");
 				led_display(10);
 			} else {
 				printk("special key");

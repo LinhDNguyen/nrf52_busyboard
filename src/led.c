@@ -8,8 +8,17 @@
 #include "led.h"
 
 #define GPIO_NAME	CONFIG_GPIO_NRF5_P0_DEV_NAME
+#define ON 0
+#define OFF 1
+
+#define STACK_SIZE 128
 
 static struct device *gpiob = NULL;
+static u8_t s_led_pins[] = {LED_PIN_1, LED_PIN_2, LED_PIN_3, LED_PIN_4, LED_PIN_5, LED_PIN_6, LED_PIN_7, LED_PIN_8, LED_PIN_9, LED_PIN_10};
+static struct k_thread s_led_thread;
+static K_THREAD_STACK_DEFINE(s_stack, STACK_SIZE);
+
+static void s_led_task_handler(void *id, void *unused1, void *unused2);
 
 void led_init()
 {
@@ -22,19 +31,25 @@ void led_init()
 	}
 
 	// Configure leds
-	for (i = LED_PIN_1; i <= LED_PIN_10; ++i) {
-		gpio_pin_configure(gpiob, i, GPIO_DIR_OUT);
+	for (i = 0; i < sizeof(s_led_pins); ++i) {
+		printk("gpio %d/%d %d -> %d\n", i + 1, sizeof(s_led_pins), s_led_pins[i], OFF);
+		gpio_pin_configure(gpiob, s_led_pins[i], GPIO_DIR_OUT);
+		gpio_pin_write(gpiob, s_led_pins[i], OFF);
 	}
+
+	// Start thread
+	k_thread_create(&s_led_thread, s_stack, K_THREAD_STACK_SIZEOF(my_stack_area),
+				s_led_task_handler, NULL, NULL, NULL, 4, 0, K_NO_WAIT);
 }
 
 void led_set(u32_t leds)
 {
 	int i;
 
-	for (i = LED_PIN_1; i <= LED_PIN_10; ++i) {
-		if (leds & (1 << i)) {
+	for (i = 0; i < sizeof(s_led_pins); ++i) {
+		if (leds & (1 << s_led_pins[i])) {
 			// set
-			gpio_pin_write(gpiob, i, 0);
+			gpio_pin_write(gpiob, s_led_pins[i], ON);
 		}
 	}
 }
@@ -43,10 +58,10 @@ void led_clear(u32_t leds)
 {
 	int i;
 
-	for (i = LED_PIN_1; i <= LED_PIN_10; ++i) {
-		if (leds & (1 << i)) {
+	for (i = 0; i < sizeof(s_led_pins); ++i) {
+		if (leds & (1 << s_led_pins[i])) {
 			// clear
-			gpio_pin_write(gpiob, i, 1);
+			gpio_pin_write(gpiob, s_led_pins[i], OFF);
 		}
 	}
 }
@@ -55,24 +70,28 @@ void led_write(u32_t mask)
 {
 	int i;
 
-	for (i = LED_PIN_1; i <= LED_PIN_10; ++i) {
-		printk("==%d", i);
-		if (mask & (1 << i)) {
+	for (i = 0; i < sizeof(s_led_pins); ++i) {
+		// printk("==%d", i);
+		if (mask & (1 << s_led_pins[i])) {
 			// set
-			printk(":1\n");
-			gpio_pin_write(gpiob, i, 0);
+			// printk(":1\n");
+			gpio_pin_write(gpiob, s_led_pins[i], ON);
 		} else {
 			// clear
-			printk(":0\n");
-			gpio_pin_write(gpiob, i, 1);
+			// printk(":0\n");
+			gpio_pin_write(gpiob, s_led_pins[i], OFF);
 		}
 	}
 }
 
 void led_display(u32_t num)
 {
-	printk("led_display: %u\n", num);
+	// printk("led_display: %u\n", num);
 	switch (num) {
+		case 0:
+		led_write(0);
+		break;
+
 		case 1:
 		led_write(LED_1);
 		break;
@@ -116,4 +135,9 @@ void led_display(u32_t num)
 		default:
 		break;
 	}
+}
+
+static void s_led_task_handler(void *id, void *unused1, void *unused2)
+{
+
 }
