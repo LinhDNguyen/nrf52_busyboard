@@ -147,7 +147,7 @@ static void s_eff_blink_handler(void)
 
 static void s_eff_free_handler(void)
 {
-	u32_t i = s_loop_cnt % 10;
+	u32_t i = s_loop_cnt % 20;
 
 	// if (s_loop_cnt & 0x01) return;
 
@@ -156,44 +156,40 @@ static void s_eff_free_handler(void)
 		led_write(LED_1 | LED_3);
 		break;
 
-		case 1:
+		case 2:
 		led_write(LED_3 | LED_5);
 		break;
 
-		case 2:
+		case 4:
 		led_write(LED_5 | LED_7);
 		break;
 
-		case 3:
+		case 6:
 		led_write(LED_7 | LED_9);
 		break;
 
-		case 4:
+		case 8:
 		led_write(LED_9 | LED_10);
 		break;
 
-		case 5:
+		case 10:
 		led_write(LED_10 | LED_8);
 		break;
 
-		case 6:
+		case 12:
 		led_write(LED_8 | LED_6);
 		break;
 
-		case 7:
+		case 14:
 		led_write(LED_6 | LED_4);
 		break;
 
-		case 8:
+		case 16:
 		led_write(LED_4 | LED_2);
 		break;
 
-		case 9:
+		case 18:
 		led_write(LED_2 | LED_1);
-		break;
-
-		default:
-		led_write(0);
 		break;
 	}
 }
