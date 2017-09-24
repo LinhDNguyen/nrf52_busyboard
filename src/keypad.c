@@ -4,6 +4,7 @@
 #include <gpio.h>
 #include <misc/util.h>
 #include <misc/printk.h>
+#include <logging/sys_log.h>
 
 #include "keypad.h"
 
@@ -27,7 +28,7 @@ void keypad_config()
 
 	gpiob = device_get_binding(GPIO_NAME);
 	if (!gpiob) {
-		printk("error\n");
+		SYS_LOG_ERR("Cannot get GPIO device %s", GPIO_NAME);
 		return;
 	}
 
@@ -35,11 +36,13 @@ void keypad_config()
 	for (i = 0; i < sizeof(row_pins); ++i) {
 		gpio_pin_configure(gpiob, row_pins[i], GPIO_DIR_OUT);
 	}
+	SYS_LOG_DBG("%d rows configured", sizeof(row_pins));
 
 	// Configure col pins
 	for (i = 0; i < sizeof(col_pins); ++i) {
 		gpio_pin_configure(gpiob, col_pins[i], GPIO_DIR_IN |  GPIO_PUD_PULL_DOWN);
 	}
+	SYS_LOG_DBG("%d cols configured", sizeof(col_pins));
 }
 
 char keypad_scan()

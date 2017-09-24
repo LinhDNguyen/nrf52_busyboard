@@ -4,6 +4,7 @@
 #include <gpio.h>
 #include <misc/util.h>
 #include <misc/printk.h>
+#include <logging/sys_log.h>
 
 #include "led.h"
 
@@ -11,14 +12,8 @@
 #define ON 0
 #define OFF 1
 
-#define STACK_SIZE 128
-
 static struct device *gpiob = NULL;
 static u8_t s_led_pins[] = {LED_PIN_1, LED_PIN_2, LED_PIN_3, LED_PIN_4, LED_PIN_5, LED_PIN_6, LED_PIN_7, LED_PIN_8, LED_PIN_9, LED_PIN_10};
-static struct k_thread s_led_thread;
-static K_THREAD_STACK_DEFINE(s_stack, STACK_SIZE);
-
-static void s_led_task_handler(void *id, void *unused1, void *unused2);
 
 void led_init()
 {
@@ -26,20 +21,17 @@ void led_init()
 
 	gpiob = device_get_binding(GPIO_NAME);
 	if (!gpiob) {
-		printk("error\n");
+		SYS_LOG_ERR("Cannot get GPIO device %s", GPIO_NAME);
 		return;
 	}
 
 	// Configure leds
 	for (i = 0; i < sizeof(s_led_pins); ++i) {
-		printk("gpio %d/%d %d -> %d\n", i + 1, sizeof(s_led_pins), s_led_pins[i], OFF);
+		SYS_LOG_DBG("gpio %d/%d %d -> %d", i + 1, sizeof(s_led_pins), s_led_pins[i], OFF);
 		gpio_pin_configure(gpiob, s_led_pins[i], GPIO_DIR_OUT);
 		gpio_pin_write(gpiob, s_led_pins[i], OFF);
 	}
-
-	// Start thread
-	k_thread_create(&s_led_thread, s_stack, K_THREAD_STACK_SIZEOF(my_stack_area),
-				s_led_task_handler, NULL, NULL, NULL, 4, 0, K_NO_WAIT);
+	SYS_LOG_INF("%d leds configured", sizeof(s_led_pins));
 }
 
 void led_set(u32_t leds)
@@ -135,9 +127,4 @@ void led_display(u32_t num)
 		default:
 		break;
 	}
-}
-
-static void s_led_task_handler(void *id, void *unused1, void *unused2)
-{
-
 }
